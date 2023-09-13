@@ -14,14 +14,7 @@ const allowedOrigins = ["http://127.0.0.1:5173"];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    // origin: "*",
+    origin: "*",
     credentials: true, // Make sure this is set if you're including credentials
   })
 );
