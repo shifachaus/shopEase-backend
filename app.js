@@ -10,12 +10,18 @@ const errorMiddleware = require("./middleware/error");
 //config
 dotenv.config({ path: "./config/config.env" });
 
-const allowedOrigins = ["http://127.0.0.1:5173"];
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
 app.use(
   cors({
-    origin: "*",
-    credentials: true, // Make sure this is set if you're including credentials
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 
