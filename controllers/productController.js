@@ -77,7 +77,7 @@ exports.uppdateProduct = catchAsyncErrors(async (req, res) => {
   if (!product) {
     return next(new ErrorHandler("Product not found", 404));
   }
-  // console.log(product?.images);
+
   //Update Image
   let images = [];
 
@@ -130,8 +130,6 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     const data = await cloudinary.v2.uploader.destroy(
       product.images[i].public_id
     );
-
-    console.log(data, `CLOUDINARY, Image ${i + 1} deleted successfully`);
   }
 
   await Product.findOneAndRemove({ _id: product._id });
@@ -197,7 +195,7 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
 //Get All Reviews of product
 exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.id);
-  console.log(product);
+
   if (!product) {
     return next(new ErrorHandler("Product not found", 404));
   }

@@ -53,7 +53,6 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
 // get logged in user  Orders
 exports.myOrders = catchAsyncErrors(async (req, res, next) => {
   const orders = await Order.find({ user: req.user._id });
-  // console.log(orders);
 
   res.status(200).json({
     success: true,
@@ -67,7 +66,6 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
   let totalAmount = 0;
   orders.forEach((order) => (totalAmount += order.totalPrice));
 
-  // console.log(orders, "ADMIN", total  Amount);
   res.status(200).json({
     success: true,
     totalAmount,

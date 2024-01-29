@@ -8,8 +8,6 @@ const cloudinary = require("cloudinary");
 
 //Register a user
 exports.registerUser = catchAsyncErrors(async (req, res) => {
-  console.log(req.body.name, "REGISTER");
-
   const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
     folder: "avatars",
     width: 150,
@@ -36,7 +34,6 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
   // checking if user has given password and email both
-
   if (!email || !password) {
     return next(new ErrorHandler("Please Enter Email & Password", 400));
   }
@@ -75,18 +72,10 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User not found", 404));
   }
-
   // Get ResetPassword Token
   const resetToken = user.getResetPasswordToken();
-
   await user.save({ validateBeforeSave: false });
-
   const resetPasswordUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
-  console.log(resetPasswordUrl);
-  // const resetPasswordUrl = `${req.protocol}://${req.get(
-  //   "host"
-  // )}/api/v1/password/reset/${resetToken}`;
-
   const message = `Your password reset token : \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
 
   try {
@@ -112,20 +101,16 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
 // Reset Password
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
-  // console.log(req.body.password, "PASS");
-  // creating token hash
   const resetPasswordToken = crypto
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
-  // console.log(resetPasswordToken, req.body.password, "TOKEN");
 
   const user = await User.findOne({
     resetPasswordToken,
     resetPasswordExpire: { $gt: Date.now() },
   });
 
-  // console.log(user, "USER");
   if (!user) {
     return next(
       new ErrorHandler(
@@ -180,12 +165,11 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
   };
-  console.log(req.body.avatar, "AVATAR");
+
   if (req.body.avatar !== "") {
     const user = await User.findById(req.user.id);
 
     const imageId = user.avatar.public_id;
-    console.log(user, imageId, "USER");
 
     await cloudinary.v2.uploader.destroy(imageId);
 
@@ -240,8 +224,6 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     role: req.body.role,
   };
 
-  console.log(req.body, "newUserDatanewUserData");
-
   const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
     runValidators: true,
@@ -263,7 +245,6 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
   const imageId = user.avatar.public_id;
   const data = await cloudinary.v2.uploader.destroy(imageId);
-  console.log(data, "IMAGE DELETED ", imageId);
 
   await User.findOneAndRemove({ _id: user._id });
 
