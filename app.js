@@ -8,7 +8,11 @@ const cookieParser = require("cookie-parser");
 const errorMiddleware = require("./middleware/error");
 
 //config
-dotenv.config({ path: "./config/config.env" });
+
+// Config
+if (process.env.NODE_ENV !== "PRODUCTION") {
+  require("dotenv").config({ path: "./config/config.env" });
+}
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
