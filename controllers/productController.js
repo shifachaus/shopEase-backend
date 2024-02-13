@@ -36,6 +36,11 @@ exports.createProduct = catchAsyncErrors(async (req, res) => {
 
 //Get All Products
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : "*";
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+
   const resultPerPage = 8;
 
   // Create an instance of ApiFeatures with the initial query

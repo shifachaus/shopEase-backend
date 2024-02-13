@@ -17,5 +17,10 @@ exports.processPayment = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.sendStripeApiKey = catchAsyncErrors(async (req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : "*";
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+
   res.status(200).json({ stripeApiKey: process.env.STRIPE_API_KEY });
 });
