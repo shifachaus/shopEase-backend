@@ -135,11 +135,6 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 //Get User Details.
 exports.getUserDetail = catchAsyncErrors(async (req, res, next) => {
-  const origin = req.headers.origin;
-  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-  const allowedOrigin = allowedOrigins.includes(origin) ? origin : "*";
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-
   const user = await User.findById(req.user.id);
   res.status(200).json({ success: true, user });
 });

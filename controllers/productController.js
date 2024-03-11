@@ -36,11 +36,6 @@ exports.createProduct = catchAsyncErrors(async (req, res) => {
 
 //Get All Products
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
-  const origin = req.headers.origin;
-  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-  const allowedOrigin = allowedOrigins.includes(origin) ? origin : "*";
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-
   const resultPerPage = 8;
 
   // Create an instance of ApiFeatures with the initial query
@@ -76,7 +71,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
 });
 
 //UPDATE PRODUCT --- Admin
-exports.uppdateProduct = catchAsyncErrors(async (req, res) => {
+exports.updateProduct = catchAsyncErrors(async (req, res) => {
   let product = await Product.findById(req.params.id);
 
   if (!product) {
@@ -94,8 +89,11 @@ exports.uppdateProduct = catchAsyncErrors(async (req, res) => {
 
   if (images !== undefined) {
     // Deleting Images From Cloudinary
-    for (let i = 0; i < product?.images?.length; i++) {
-      await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+
+    if (product.images && product.images.length > 0) {
+      for (let i = 0; i < product.images.length; i++) {
+        await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+      }
     }
 
     const imagesLink = [];

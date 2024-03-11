@@ -7,11 +7,13 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const errorMiddleware = require("./middleware/error");
 
-//config
+// Config
 dotenv.config({ path: "./config/config.env" });
 
+// Parse allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 
+// CORS middleware
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,7 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(fileUpload());
 
-//Route Imports
+// Route Imports
 const product = require("./routes/productRoute");
 const user = require("./routes/userRoute");
 const order = require("./routes/orderRoute");
@@ -44,4 +46,5 @@ app.use("/api/v1", payment);
 
 // Middleware for Errors
 app.use(errorMiddleware);
+
 module.exports = app;

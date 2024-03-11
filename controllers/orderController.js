@@ -52,11 +52,6 @@ exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
 
 // get logged in user  Orders
 exports.myOrders = catchAsyncErrors(async (req, res, next) => {
-  const origin = req.headers.origin;
-  const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
-  const allowedOrigin = allowedOrigins.includes(origin) ? origin : "*";
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-
   const orders = await Order.find({ user: req.user._id });
 
   res.status(200).json({

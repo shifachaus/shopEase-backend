@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getAllProducts,
   createProduct,
-  uppdateProduct,
+  updateProduct,
   deleteProduct,
   getProductDetails,
   createProductReview,
@@ -26,7 +26,7 @@ router
 
 router
   .route("/product/:id")
-  .put(isAuthenticatedUser, authorizeRoles("admin"), uppdateProduct);
+  .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct);
 
 router
   .route("/product/:id")
