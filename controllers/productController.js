@@ -29,6 +29,17 @@ exports.createProduct = catchAsyncErrors(async (req, res) => {
   req.body.images = imagesLink;
   req.body.user = req.user.id;
 
+  req.body.soldCount = 0;
+  req.body.ratings = 0;
+  req.body.numOfReviews = 0;
+
+  req.body.tags = {
+    isFeatured: req.body.tags?.isFeatured || false,
+    isBestSeller: false,
+    isNew: true,
+    isSale: req.body.originalPrice && req.body.originalPrice > req.body.price,
+  };
+
   const product = await Product.create(req.body);
 
   res.status(200).json({ success: true, product });
@@ -36,7 +47,7 @@ exports.createProduct = catchAsyncErrors(async (req, res) => {
 
 //Get All Products
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
-  const resultPerPage = 8;
+  const resultPerPage = 15;
 
   // Create an instance of ApiFeatures with the initial query
   const apiFeature = new ApiFeatures(Product.find(), req.query)
@@ -110,6 +121,19 @@ exports.updateProduct = catchAsyncErrors(async (req, res) => {
     }
 
     req.body.images = imagesLink;
+  }
+
+  const updatedPrice =
+    req.body.price !== undefined ? req.body.price : product.price;
+
+  const updatedOriginalPrice =
+    req.body.originalPrice !== undefined
+      ? req.body.originalPrice
+      : product.originalPrice;
+
+  if (updatedOriginalPrice && updatedPrice) {
+    req.body["tags.isSale"] =
+      Number(updatedOriginalPrice) > Number(updatedPrice);
   }
 
   product = await Product.findByIdAndUpdate(req.params.id, req.body, {
