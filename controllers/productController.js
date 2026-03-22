@@ -49,32 +49,25 @@ exports.createProduct = catchAsyncErrors(async (req, res) => {
 exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
   const resultPerPage = 15;
 
-  // Create an instance of ApiFeatures with the initial query
   const apiFeature = new ApiFeatures(Product.find(), req.query)
     .search()
     .filter();
 
-  // Execute the filtered query to get products
+  // Count AFTER filter
+  const filteredProductsCount = await Product.countDocuments(
+    apiFeature.query.getQuery(),
+  );
+
+  // Apply pagination
+  apiFeature.pagination(resultPerPage);
+
   const products = await apiFeature.query;
 
-  // Calculate the count of all products (before filtering)
   const productsCount = await Product.countDocuments();
-
-  // Calculate the count of filtered products
-  const filteredProductsCount = products.length;
-
-  // Create a new instance of ApiFeatures for pagination
-  const paginatedApiFeature = new ApiFeatures(Product.find(), req.query)
-    .search()
-    .filter()
-    .pagination(resultPerPage);
-
-  // Execute the paginated query to get paginated products
-  const paginatedProducts = await paginatedApiFeature.query;
 
   res.status(200).json({
     success: true,
-    products: paginatedProducts,
+    products,
     productsCount,
     resultPerPage,
     filteredProductsCount,
@@ -155,7 +148,7 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   // Deleting Images from cloudinary
   for (let i = 0; i < product.images.length; i++) {
     const data = await cloudinary.v2.uploader.destroy(
-      product.images[i].public_id
+      product.images[i].public_id,
     );
   }
 
@@ -191,13 +184,13 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(productId);
 
   const isReviewed = product.reviews.find(
-    (rev) => rev.user.toString() === req.user._id.toString()
+    (rev) => rev.user.toString() === req.user._id.toString(),
   );
 
   if (isReviewed) {
     product.reviews.forEach((rev) => {
       if (rev.user.toString() === req.user._id.toString())
-        (rev.rating = rating), (rev.comment = comment);
+        ((rev.rating = rating), (rev.comment = comment));
     });
   } else {
     product.reviews.push(review);
@@ -239,7 +232,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
   }
 
   const reviews = product.reviews.filter(
-    (rev) => rev._id.toString() !== req.query.id.toString()
+    (rev) => rev._id.toString() !== req.query.id.toString(),
   );
 
   let avg = 0;
@@ -269,7 +262,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
       new: true,
       runValidators: true,
       useFindAndModify: false,
-    }
+    },
   );
 
   res.status(200).json({
